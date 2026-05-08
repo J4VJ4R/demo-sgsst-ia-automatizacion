@@ -81,7 +81,7 @@ function formatDateTime(value?: Date | string) {
 }
 
 const ROLE_LABELS: Record<string, string> = {
-  ADMIN_PMD: "Administrador PMD",
+  ADMIN_PMD: "Administrador SG-SST-IA",
   CONSULTANT: "Consultor",
   CLIENT_VIEWER: "Cliente",
   CLIENT: "Cliente",

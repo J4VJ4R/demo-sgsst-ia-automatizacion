@@ -142,23 +142,23 @@ export function HelpCenter({ userRole }: HelpCenterProps) {
   return (
     <div className="flex flex-col space-y-8 min-h-screen bg-transparent">
       {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-3xl bg-slate-900 border border-slate-800 p-8 md:p-12 text-center shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 border border-slate-800 p-8 md:p-12 text-center shadow-2xl">
         <div className="absolute inset-0 bg-[url('/img/grid-pattern.svg')] opacity-10" />
         <div className="relative z-10 flex flex-col items-center max-w-3xl mx-auto space-y-6">
-          <Badge variant="outline" className="border-[#D4AF37] text-[#D4AF37] px-4 py-1 rounded-full text-sm font-medium bg-[#D4AF37]/10 backdrop-blur-sm">
+          <Badge variant="outline" className="border-sky-400/70 text-sky-200 px-4 py-1 rounded-full text-sm font-medium bg-sky-500/10 backdrop-blur-sm">
             Centro de Soporte 2026
           </Badge>
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white drop-shadow-sm">
-            ¿Cómo podemos <span className="text-[#D4AF37]">ayudarle</span> hoy?
+            ¿Cómo podemos <span className="text-sky-300">ayudarle</span> hoy?
           </h1>
           <p className="text-lg text-slate-300 max-w-2xl font-medium">
-            Explore nuestra base de conocimiento actualizada con guías, tutoriales y recursos para dominar la plataforma PMD.
+            Explore nuestra base de conocimiento actualizada con guías, tutoriales y recursos para dominar la plataforma SG-SST-IA.
           </p>
           
           {/* Search Bar */}
           <div className="relative w-full max-w-2xl mt-8 group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-[#D4AF37]/20 to-[#D4AF37]/0 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
-            <div className="relative flex items-center bg-white border border-slate-200 rounded-full shadow-lg p-1 transition-all focus-within:border-[#D4AF37] focus-within:ring-2 focus-within:ring-[#D4AF37]/20">
+            <div className="absolute -inset-1 bg-gradient-to-r from-sky-500/25 to-sky-500/0 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+            <div className="relative flex items-center bg-white border border-slate-200 rounded-full shadow-lg p-1 transition-all focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-500/20">
               <Search className="h-5 w-5 text-slate-400 ml-4" />
               <Input 
                 value={searchQuery}
@@ -176,7 +176,7 @@ export function HelpCenter({ userRole }: HelpCenterProps) {
                   <X className="h-4 w-4" />
                 </Button>
               )}
-              <Button className="rounded-full bg-[#D4AF37] text-black hover:bg-[#B59530] font-bold px-6 h-10 mr-1 transition-transform active:scale-95 shadow-sm">
+              <Button className="rounded-full bg-sky-500 text-white hover:bg-sky-600 font-bold px-6 h-10 mr-1 transition-transform active:scale-95 shadow-sm">
                 Buscar
               </Button>
             </div>
@@ -192,7 +192,7 @@ export function HelpCenter({ userRole }: HelpCenterProps) {
           className={cn(
             "rounded-full px-6 transition-all font-medium",
             selectedCategory === "Todas" 
-              ? "bg-[#D4AF37] text-black hover:bg-[#B59530] border-transparent shadow-md" 
+              ? "bg-sky-500 text-white hover:bg-sky-600 border-transparent shadow-md" 
               : "bg-white border-slate-300 text-slate-600 hover:text-slate-900 hover:border-slate-400 hover:bg-slate-50"
           )}
         >
@@ -206,7 +206,7 @@ export function HelpCenter({ userRole }: HelpCenterProps) {
             className={cn(
               "rounded-full px-6 transition-all font-medium",
               selectedCategory === cat.id
-                ? "bg-[#D4AF37] text-black hover:bg-[#B59530] border-transparent shadow-md"
+                ? "bg-sky-500 text-white hover:bg-sky-600 border-transparent shadow-md"
                 : "bg-white border-slate-300 text-slate-600 hover:text-slate-900 hover:border-slate-400 hover:bg-slate-50"
             )}
           >
@@ -224,15 +224,15 @@ export function HelpCenter({ userRole }: HelpCenterProps) {
             return (
               <div 
                 key={article.id} 
-                className="group relative flex flex-col bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-[#D4AF37]/50 transition-all duration-300 cursor-pointer overflow-hidden"
+                className="group relative flex flex-col bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-sky-500/50 transition-all duration-300 cursor-pointer overflow-hidden"
                 onClick={() => setSelectedArticle(article)}
               >
                 {/* Hover Glow Effect */}
-                <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-[#D4AF37]/5 rounded-full blur-2xl group-hover:bg-[#D4AF37]/10 transition-all duration-500" />
+                <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-sky-500/5 rounded-full blur-2xl group-hover:bg-sky-500/10 transition-all duration-500" />
                 
                 <div className="flex items-start justify-between mb-4">
-                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 group-hover:border-[#D4AF37]/30 transition-colors">
-                    <Icon className="h-6 w-6 text-[#D4AF37]" />
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 group-hover:border-sky-500/30 transition-colors">
+                    <Icon className="h-6 w-6 text-sky-600" />
                   </div>
                   {article.videoUrl && (
                     <Badge variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200 border-0">
@@ -241,7 +241,7 @@ export function HelpCenter({ userRole }: HelpCenterProps) {
                   )}
                 </div>
                 
-                <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-[#D4AF37] transition-colors line-clamp-2">
+                <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-sky-700 transition-colors line-clamp-2">
                   {article.title}
                 </h3>
                 
@@ -253,7 +253,7 @@ export function HelpCenter({ userRole }: HelpCenterProps) {
                   <span className="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-1 rounded">
                     {article.category}
                   </span>
-                  <div className="flex items-center text-sm font-semibold text-slate-700 group-hover:text-[#D4AF37] transition-colors">
+                  <div className="flex items-center text-sm font-semibold text-slate-700 group-hover:text-sky-700 transition-colors">
                     Leer guía
                     <ArrowRight className="h-4 w-4 ml-2 transform group-hover:translate-x-1 transition-transform" />
                   </div>
@@ -274,7 +274,7 @@ export function HelpCenter({ userRole }: HelpCenterProps) {
           <Button 
             variant="link" 
             onClick={() => { setSearchQuery(""); setSelectedCategory("Todas"); }}
-            className="text-[#D4AF37] mt-4 font-semibold"
+            className="text-sky-700 mt-4 font-semibold"
           >
             Limpiar filtros
           </Button>
@@ -294,7 +294,7 @@ export function HelpCenter({ userRole }: HelpCenterProps) {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               onClick={() => setIsTicketOpen(true)}
-              className="bg-[#D4AF37] text-black hover:bg-[#B59530] h-12 px-8 rounded-full text-base font-bold shadow-[0_0_20px_rgba(212,175,55,0.2)] hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] transition-all"
+              className="bg-sky-500 text-white hover:bg-sky-600 h-12 px-8 rounded-full text-base font-bold shadow-[0_0_20px_rgba(56,189,248,0.20)] hover:shadow-[0_0_30px_rgba(56,189,248,0.35)] transition-all"
             >
               Abrir Ticket de Soporte
             </Button>
@@ -304,7 +304,7 @@ export function HelpCenter({ userRole }: HelpCenterProps) {
               className="bg-transparent border-white/30 text-white hover:bg-white hover:text-slate-900 h-12 px-8 rounded-full text-base font-medium backdrop-blur-sm transition-all duration-300"
               onClick={() => console.log("[TRACKING] Email Contact Clicked", { timestamp: new Date().toISOString() })}
             >
-              <a href="mailto:pmdsoporte@gmail.com?subject=Solicitud%20de%20Soporte%20PMD">
+              <a href="mailto:pmdsoporte@gmail.com?subject=Solicitud%20de%20Soporte%20SG-SST-IA">
                 Contactar por Email
               </a>
             </Button>
@@ -332,7 +332,7 @@ export function HelpCenter({ userRole }: HelpCenterProps) {
                   onChange={(e) => setTicketForm({...ticketForm, name: e.target.value})}
                   required 
                   placeholder="Su nombre"
-                  className="bg-white border-slate-200 text-slate-900 focus-visible:ring-[#D4AF37]"
+                  className="bg-white border-slate-200 text-slate-900 focus-visible:ring-sky-500"
                 />
               </div>
               <div className="space-y-2">
@@ -344,7 +344,7 @@ export function HelpCenter({ userRole }: HelpCenterProps) {
                   onChange={(e) => setTicketForm({...ticketForm, email: e.target.value})}
                   required 
                   placeholder="nombre@empresa.com"
-                  className="bg-white border-slate-200 text-slate-900 focus-visible:ring-[#D4AF37]"
+                  className="bg-white border-slate-200 text-slate-900 focus-visible:ring-sky-500"
                 />
               </div>
             </div>
@@ -357,7 +357,7 @@ export function HelpCenter({ userRole }: HelpCenterProps) {
                 onChange={(e) => setTicketForm({...ticketForm, subject: e.target.value})}
                 required 
                 placeholder="Resumen del problema"
-                className="bg-white border-slate-200 text-slate-900 focus-visible:ring-[#D4AF37]"
+                className="bg-white border-slate-200 text-slate-900 focus-visible:ring-sky-500"
               />
             </div>
 
@@ -367,7 +367,7 @@ export function HelpCenter({ userRole }: HelpCenterProps) {
                 value={ticketForm.priority} 
                 onValueChange={(value) => setTicketForm({...ticketForm, priority: value})}
               >
-                <SelectTrigger className="bg-white border-slate-200 text-slate-900 focus:ring-[#D4AF37]">
+                <SelectTrigger className="bg-white border-slate-200 text-slate-900 focus:ring-sky-500">
                   <SelectValue placeholder="Seleccione prioridad" />
                 </SelectTrigger>
                 <SelectContent>
@@ -389,14 +389,14 @@ export function HelpCenter({ userRole }: HelpCenterProps) {
                   onPaste={handlePaste}
                   required 
                   placeholder="Describa su solicitud en detalle... (Puede pegar capturas de pantalla con Ctrl+V)"
-                  className="min-h-[120px] bg-white border-slate-200 text-slate-900 focus-visible:ring-[#D4AF37]"
+                  className="min-h-[120px] bg-white border-slate-200 text-slate-900 focus-visible:ring-sky-500"
                 />
                 <div className="mt-2 flex items-center gap-2">
                   <Input 
                     type="file" 
                     accept="image/*" 
                     onChange={handleFileChange}
-                    className="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#D4AF37]/10 file:text-[#D4AF37] hover:file:bg-[#D4AF37]/20" 
+                    className="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-sky-500/10 file:text-sky-700 hover:file:bg-sky-500/15" 
                   />
                 </div>
                 {ticketForm.attachment && (
@@ -426,7 +426,7 @@ export function HelpCenter({ userRole }: HelpCenterProps) {
               <Button 
                 type="submit" 
                 disabled={isSubmittingTicket}
-                className="bg-[#D4AF37] text-black hover:bg-[#B59530] font-bold"
+                className="bg-sky-500 text-white hover:bg-sky-600 font-bold"
               >
                 {isSubmittingTicket ? "Enviando..." : "Enviar Ticket"}
               </Button>
@@ -442,7 +442,7 @@ export function HelpCenter({ userRole }: HelpCenterProps) {
             <>
               <div className="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-slate-100 p-6 flex items-start justify-between">
                 <div>
-                  <Badge variant="outline" className="mb-2 border-[#D4AF37] text-[#D4AF37] bg-[#D4AF37]/5 font-semibold">
+                  <Badge variant="outline" className="mb-2 border-sky-500/70 text-sky-700 bg-sky-500/5 font-semibold">
                     {selectedArticle.category}
                   </Badge>
                   <DialogTitle className="text-2xl font-bold text-slate-900">
@@ -471,18 +471,18 @@ export function HelpCenter({ userRole }: HelpCenterProps) {
                   </div>
                 )}
                 
-                <div className="prose prose-slate max-w-none prose-headings:text-slate-900 prose-p:text-slate-700 prose-li:text-slate-700 prose-strong:text-slate-900 prose-a:text-[#D4AF37]">
+                <div className="prose prose-slate max-w-none prose-headings:text-slate-900 prose-p:text-slate-700 prose-li:text-slate-700 prose-strong:text-slate-900 prose-a:text-sky-700">
                   <ReactMarkdown
                     components={{
                       h1: ({node, ...props}) => <h1 className="text-3xl font-bold text-slate-900 mb-6 border-b border-slate-200 pb-4" {...props} />,
                       h2: ({node, ...props}) => <h2 className="text-2xl font-semibold text-slate-900 mt-8 mb-4 flex items-center" {...props} />,
-                      h3: ({node, ...props}) => <h3 className="text-xl font-medium text-[#D4AF37] mt-6 mb-3" {...props} />,
+                      h3: ({node, ...props}) => <h3 className="text-xl font-medium text-sky-700 mt-6 mb-3" {...props} />,
                       p: ({node, ...props}) => <p className="text-slate-700 leading-relaxed mb-4 text-base" {...props} />,
                       ul: ({node, ...props}) => <ul className="list-disc list-outside ml-6 space-y-2 text-slate-700 mb-6" {...props} />,
                       li: ({node, ...props}) => <li className="pl-1" {...props} />,
                       strong: ({node, ...props}) => <strong className="font-semibold text-slate-900" {...props} />,
-                      blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-[#D4AF37] pl-4 italic text-slate-600 bg-amber-50 py-3 pr-4 rounded-r my-6 shadow-sm" {...props} />,
-                      a: ({node, ...props}) => <a className="text-[#D4AF37] font-medium hover:underline underline-offset-4 hover:text-[#B59530]" {...props} />,
+                      blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-sky-500 pl-4 italic text-slate-600 bg-sky-50 py-3 pr-4 rounded-r my-6 shadow-sm" {...props} />,
+                      a: ({node, ...props}) => <a className="text-sky-700 font-medium hover:underline underline-offset-4 hover:text-sky-900" {...props} />,
                       code: ({node, ...props}) => <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-200" {...props} />,
                     }}
                   >
@@ -495,7 +495,7 @@ export function HelpCenter({ userRole }: HelpCenterProps) {
                   <h4 className="text-sm font-semibold text-slate-500 mb-3 uppercase tracking-wider">Etiquetas</h4>
                   <div className="flex flex-wrap gap-2">
                     {selectedArticle.tags.map(tag => (
-                      <span key={tag} className="text-xs bg-white text-slate-600 px-3 py-1 rounded-full border border-slate-200 shadow-sm font-medium hover:border-[#D4AF37] hover:text-[#D4AF37] transition-colors cursor-default">
+                      <span key={tag} className="text-xs bg-white text-slate-600 px-3 py-1 rounded-full border border-slate-200 shadow-sm font-medium hover:border-sky-500 hover:text-sky-700 transition-colors cursor-default">
                         #{tag}
                       </span>
                     ))}

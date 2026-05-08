@@ -12,7 +12,7 @@ export function getSupportTicketEmailTemplate(data: {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ticket de Soporte - PMD Servicios</title>
+  <title>Ticket de Soporte - SG-SST-IA</title>
   <style>
     body {
       font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -41,7 +41,7 @@ export function getSupportTicketEmailTemplate(data: {
       text-decoration: none;
     }
     .logo span {
-      color: #D4AF37;
+      color: #38bdf8;
     }
     .content {
       padding: 40px 30px;
@@ -103,7 +103,7 @@ export function getSupportTicketEmailTemplate(data: {
 <body>
   <div class="container">
     <div class="header">
-      <div class="logo">PMD <span>Servicios</span></div>
+      <div class="logo">SG-SST-IA <span>Soporte</span></div>
     </div>
     <div class="content">
       <h1>Nuevo Ticket de Soporte</h1>
@@ -137,7 +137,7 @@ export function getSupportTicketEmailTemplate(data: {
       </div>
     </div>
     <div class="footer">
-      &copy; ${new Date().getFullYear()} PMD Servicios Integrales. Todos los derechos reservados.<br>
+      &copy; ${new Date().getFullYear()} SG-SST-IA. Todos los derechos reservados.<br>
       Este es un correo automático generado por el sistema de soporte.
     </div>
   </div>

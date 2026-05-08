@@ -240,7 +240,7 @@ export async function requestStudentPasswordReset(formData: FormData) {
 
   const token = `${user.id}.${expMs}.${sig}`;
 
-  const from = (process.env.RESEND_FROM || "PMD Servicios <onboarding@resend.dev>").trim();
+  const from = (process.env.RESEND_FROM || "SG-SST-IA <onboarding@resend.dev>").trim();
   const baseUrl =
     (process.env.APP_BASE_URL || "").trim() ||
     (process.env.NODE_ENV === "production" ? "https://app.pmdservicios.com" : "http://localhost:3000");

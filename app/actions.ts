@@ -1229,7 +1229,7 @@ export async function sendSupportTicket(formData: FormData) {
       });
 
       const { data, error } = await resend.emails.send({
-        from: 'Soporte PMD <onboarding@resend.dev>',
+        from: 'Soporte SG-SST-IA <onboarding@resend.dev>',
         to: ['pmdsoporte@gmail.com'],
         subject: `[${priority}] ${subject} - Ticket de Soporte`, // Uses "Alta"
         html: htmlContent, // This uses htmlContent generated above
@@ -1340,7 +1340,7 @@ export async function sendAgendaMeetingReport(payload: {
   <body style="font-family: Arial, Helvetica, sans-serif; background:#f4f4f5; margin:0; padding:24px; color:#0f172a;">
     <div style="max-width:720px; margin:0 auto; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden;">
       <div style="background:#0f172a; padding:18px 20px;">
-        <div style="font-size:16px; font-weight:700; color:#ffffff;">PMD Servicios</div>
+        <div style="font-size:16px; font-weight:700; color:#ffffff;">SG-SST-IA</div>
         <div style="margin-top:6px; font-size:14px; color:#e2e8f0;">Reporte de reunión</div>
       </div>
       <div style="padding:18px 20px;">
@@ -1384,7 +1384,7 @@ export async function sendAgendaMeetingReport(payload: {
 </html>`;
 
     const subject = `Reporte de reunión: ${title}`;
-    const from = (process.env.RESEND_FROM || "PMD Servicios <onboarding@resend.dev>").trim();
+    const from = (process.env.RESEND_FROM || "SG-SST-IA <onboarding@resend.dev>").trim();
     const { error } = await resend.emails.send({
       from,
       to: recipients,
@@ -2789,7 +2789,7 @@ export async function deleteUser(id: string) {
       return { success: false, error: "Usuario no encontrado." };
     }
     if (user.role === "ADMIN_PMD") {
-      return { success: false, error: "No permitido: un Administrador PMD no puede eliminarse." };
+      return { success: false, error: "No permitido: un Administrador SG-SST-IA no puede eliminarse." };
     }
 
     await prisma.$transaction(async (tx) => {

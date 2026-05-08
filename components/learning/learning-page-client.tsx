@@ -865,7 +865,7 @@ function StudentCourseView(props: {
             </CardHeader>
             <CardContent className="grid gap-4">
               {activeModule ? (
-                <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-slate-200 bg-black">
+                <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-950">
                   <iframe
                     title={activeModule.title}
                     src={`https://www.youtube-nocookie.com/embed/${activeModule.youtubeVideoId}?rel=0&modestbranding=1&playsinline=1&iv_load_policy=3`}
@@ -873,11 +873,11 @@ function StudentCourseView(props: {
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   />
-                  <div className="pointer-events-auto absolute bottom-3 left-3 flex h-11 w-11 items-center justify-center rounded-full bg-[#D4AF37] text-xs font-semibold text-black shadow-sm">
-                    PMD
+                  <div className="pointer-events-auto absolute bottom-3 left-3 flex h-11 w-11 items-center justify-center rounded-full bg-sky-600 text-[10px] font-semibold text-white shadow-sm">
+                    SG-SST-IA
                   </div>
-                  <div className="pointer-events-auto absolute bottom-3 right-3 flex h-11 items-center justify-center rounded-full bg-[#D4AF37] px-4 text-sm font-semibold text-black shadow-sm">
-                    Formación PMD
+                  <div className="pointer-events-auto absolute bottom-3 right-3 flex h-11 items-center justify-center rounded-full bg-sky-600 px-4 text-sm font-semibold text-white shadow-sm">
+                    Formación SG-SST-IA
                   </div>
                 </div>
               ) : null}
@@ -923,7 +923,7 @@ function StudentCourseView(props: {
                       type="button"
                       onClick={() => setTakingExam((v) => !v)}
                       disabled={!canTakeExam}
-                      className="bg-[#D4AF37] hover:bg-[#c49f2f] text-black"
+                      className="bg-sky-600 hover:bg-sky-700 text-white"
                     >
                       <ListChecks className="mr-2 h-4 w-4" />
                       Tomar examen

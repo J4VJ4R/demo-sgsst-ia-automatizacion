@@ -232,12 +232,12 @@ export default async function ProjectDetailPage({
     const list: Array<{ id: string; name: string; roleLabel: "Administrador" | "Consultor" | "Cliente" }> = [];
 
     if (user?.role === "ADMIN_PMD" && user.id) {
-      list.push({ id: user.id, name: user.name || "Administrador PMD", roleLabel: "Administrador" });
+      list.push({ id: user.id, name: user.name || "Administrador SG-SST-IA", roleLabel: "Administrador" });
     }
 
     if (user?.role === "CONSULTANT" || user?.role === "ADMIN_PMD") {
       for (const admin of activeAdmins) {
-        list.push({ id: admin.id, name: admin.name || "Administrador PMD", roleLabel: "Administrador" });
+        list.push({ id: admin.id, name: admin.name || "Administrador SG-SST-IA", roleLabel: "Administrador" });
       }
     }
 

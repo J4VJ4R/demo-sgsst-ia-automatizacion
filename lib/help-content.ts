@@ -46,7 +46,7 @@ export const helpArticles: HelpArticle[] = [
   {
     id: "gen-001",
     slug: "introduccion-plataforma",
-    title: "Bienvenido a PMD Servicios Dashboard",
+    title: "Bienvenido a SG-SST-IA Dashboard",
     description: "Visión general de la plataforma y cómo navegar por el panel de control.",
     category: "General",
     tags: ["inicio", "navegación", "interfaz"],
@@ -54,7 +54,7 @@ export const helpArticles: HelpArticle[] = [
     updatedAt: "2026-03-01",
     icon: LayoutDashboard,
     content: `
-# Bienvenido al Ecosistema PMD
+# Bienvenido al Ecosistema SG-SST-IA
 
 Esta plataforma integral ha sido diseñada para optimizar la gestión de Seguridad y Salud en el Trabajo (SST), permitiendo un control centralizado de empresas, proyectos y cumplimiento normativo.
 
@@ -254,7 +254,7 @@ Para tareas que se repiten (ej: Inspecciones mensuales), se recomienda crear la 
     content: `
 # Gestión de Evidencias Documentales
 
-El sistema PMD actúa como un repositorio seguro para toda la documentación SST.
+El sistema SG-SST-IA actúa como un repositorio seguro para toda la documentación SST.
 
 ## Carga de Archivos
 
