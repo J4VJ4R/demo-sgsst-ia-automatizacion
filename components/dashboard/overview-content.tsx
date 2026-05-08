@@ -45,6 +45,7 @@ import {
   type ProjectSummary,
 } from "@/lib/dashboard-logic";
 import { translatePriority } from "@/lib/utils";
+import { PredictiveInsights } from "@/components/dashboard/PredictiveInsights";
 
 const OverviewChart = dynamic(() => import("@/components/dashboard/overview-chart").then(mod => mod.OverviewChart), {
   loading: () => <div className="flex h-[350px] items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>,
@@ -886,6 +887,8 @@ export function OverviewContent({ kpiData, activities, projects, initialCompanyI
             </Button>
           </div>
         </div>
+
+        <PredictiveInsights activities={filteredActivities} selectedCompanyId={selectedCompanyId} />
 
         <div className="space-y-3">
           <button
@@ -2023,6 +2026,8 @@ export function OverviewContent({ kpiData, activities, projects, initialCompanyI
             </div>
           </CardContent>
         </Card>
+
+        <PredictiveInsights activities={filteredActivities} selectedCompanyId={selectedCompanyId} />
 
         <Card className={isDark ? "border-zinc-800 bg-zinc-950" : "border-slate-200 bg-white"}>
           <CardHeader className={isDark ? "border-b border-zinc-800 pb-4" : "border-b border-slate-200 pb-4"}>

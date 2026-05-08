@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useTransition } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,9 +9,10 @@ import { calculatePriority } from "@/lib/priority-logic";
 import { canEditDueDate } from "@/lib/permissions";
 import { RequirementActions } from "@/components/activities/requirement-actions";
 import { ProjectActivityActions } from "@/components/projects/project-activity-actions";
-import { updateProjectActivity } from "@/app/actions";
+import { createProjectActivity, updateProjectActivity } from "@/app/actions";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { computeAiRiskSummary } from "@/lib/aiRiskEngine";
 
 type PriorityLevel = "Vencido" | "Por vencer" | "Cumplido";
 
@@ -23,6 +24,7 @@ export interface ProjectActivityForTable {
   dueDate: string | null;
   periodicity: string | null;
   assignedToId: string | null;
+  latestReplyMessage?: string | null;
   documents: {
     id: string;
     name: string;
@@ -39,6 +41,7 @@ export interface ProjectActivityForTable {
 
 interface ProjectActivitiesTableProps {
   activities: ProjectActivityForTable[];
+  projectId: string;
   projectName: string;
   canManageActivities: boolean;
   isAdmin: boolean;
@@ -48,6 +51,7 @@ interface ProjectActivitiesTableProps {
 
 export function ProjectActivitiesTable({
   activities,
+  projectId,
   projectName,
   canManageActivities,
   isAdmin,
@@ -78,8 +82,19 @@ export function ProjectActivitiesTable({
     return window.matchMedia("(max-width: 1023px)").matches;
   });
   const searchParams = useSearchParams();
+  const router = useRouter();
   const highlightId = searchParams.get("highlight");
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
+  const [trained, setTrained] = useState(false);
+  const [creatingMitigation, startMitigationTransition] = useTransition();
+
+  useEffect(() => {
+    try {
+      setTrained(window.localStorage.getItem("sgsst_ai_model_trained") === "1");
+    } catch {
+      setTrained(false);
+    }
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -147,6 +162,44 @@ export function ProjectActivitiesTable({
       };
     });
   }, [activities, localDueDates, now]);
+
+  const aiSummary = useMemo(() => {
+    const sources = activities.map((a) => ({
+      activityId: a.id,
+      activityTitle: a.title,
+      projectId,
+      projectName,
+      latestReplyMessage: a.latestReplyMessage ?? null,
+    }));
+    return computeAiRiskSummary(sources, { trained, onlyElectricalInspections: true });
+  }, [activities, projectId, projectName, trained]);
+
+  const canProposeMitigation = aiSummary.riskAccumulatedPct > 70;
+  const canCreateMitigation = userRole === "ADMIN_PMD" || userRole === "CONSULTANT";
+
+  const handleCreateMitigation = () => {
+    if (!canCreateMitigation) return;
+    startMitigationTransition(async () => {
+      const today = new Date();
+      const due = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 14);
+      const dueStr = due.toISOString().slice(0, 10);
+      const topZone = aiSummary.zoneProbabilities[0]?.zone || "Zona prioritaria";
+      const formData = new FormData();
+      formData.append("projectId", projectId);
+      formData.append("title", `PTA 2026: (IA) Actividad de Mitigación Riesgo Eléctrico - ${topZone}`);
+      formData.append("periodicity", "Anual");
+      formData.append("priority", "Alta");
+      formData.append("dueDate", dueStr);
+
+      const result = await createProjectActivity(formData);
+      if (result?.success) {
+        toast.success("Actividad de mitigación propuesta por IA fue creada.");
+        router.refresh();
+      } else {
+        toast.error(result?.error || "No se pudo crear la actividad de mitigación.");
+      }
+    });
+  };
 
   useEffect(() => {
     if (!highlightId) {
@@ -334,6 +387,32 @@ export function ProjectActivitiesTable({
           </div>
         </div>
       </div>
+
+      {canProposeMitigation ? (
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <div className="text-sm font-semibold text-red-900">IA · Propuesta automática para el PTA</div>
+              <div className="mt-1 text-sm text-red-800">
+                Riesgo acumulado eléctrico: <span className="font-semibold">{aiSummary.riskAccumulatedPct}%</span>. Se recomienda crear una actividad de mitigación.
+              </div>
+              <div className="mt-2 text-xs text-red-700">
+                Sugerida: Actividad de mitigación en {aiSummary.zoneProbabilities[0]?.zone || "zona prioritaria"} (distancias de seguridad, EPP dieléctrico, controles LOTO).
+              </div>
+            </div>
+            {canCreateMitigation ? (
+              <Button
+                type="button"
+                onClick={handleCreateMitigation}
+                disabled={creatingMitigation}
+                className="h-11 rounded-xl bg-red-600 px-5 text-base font-semibold text-white hover:bg-red-700"
+              >
+                {creatingMitigation ? "Creando..." : "Crear actividad PTA"}
+              </Button>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
 
       {isCompact ? (
         <div className="space-y-3">

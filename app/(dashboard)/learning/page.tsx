@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/app/auth-actions";
 import { redirect } from "next/navigation";
 import { LearningPageClient } from "@/components/learning/learning-page-client";
+import { computeAiRiskSummary } from "@/lib/aiRiskEngine";
 
 export default async function LearningPage() {
   const user = await getCurrentUser();
@@ -37,6 +38,39 @@ export default async function LearningPage() {
 
   const initialProjectId = projects[0]?.id || null;
 
+  const aiBanner =
+    role === "STUDENT" && initialProjectId
+      ? await (async () => {
+          const activities = await prisma.activity.findMany({
+            where: { projectId: initialProjectId },
+            select: {
+              id: true,
+              title: true,
+              replies: { orderBy: { createdAt: "desc" }, take: 1, select: { message: true } },
+            },
+            orderBy: { updatedAt: "desc" },
+            take: 200,
+          });
+          const summary = computeAiRiskSummary(
+            activities.map((a) => ({
+              activityId: a.id,
+              activityTitle: a.title,
+              projectId: initialProjectId,
+              latestReplyMessage: a.replies?.[0]?.message ?? null,
+            })),
+            { trained: false, onlyElectricalInspections: true }
+          );
+
+          const hasElectrical = summary.zoneProbabilities.length > 0;
+          if (!hasElectrical) return null;
+          return {
+            message:
+              "IA recomienda: Se ha priorizado el curso 'Certificación en Riesgo Eléctrico' en tu plan de formación",
+            courseTitle: "Certificación en Riesgo Eléctrico (A.T/M.T)",
+          };
+        })()
+      : null;
+
   return (
     <LearningPageClient
       currentUser={{ id: user.id, name: user.name, role }}
@@ -47,7 +81,7 @@ export default async function LearningPage() {
         status: p.status,
       }))}
       initialProjectId={initialProjectId}
+      aiBanner={aiBanner}
     />
   );
 }
-

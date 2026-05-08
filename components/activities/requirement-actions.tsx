@@ -135,6 +135,23 @@ export function RequirementActions({ activityId, status, rejectionReason, activi
   const [replyDraft, setReplyDraft] = useState("");
   const [replyDialogOpen, setReplyDialogOpen] = useState(false);
   const [replyError, setReplyError] = useState<string | null>(null);
+  const showAiElectricalSuggestion = useMemo(() => {
+    const t = (latestDoc?.activity.title || "").toLowerCase();
+    const d = replyDraft.toLowerCase();
+    const inTitle =
+      t.includes("riesgo eléctrico") ||
+      t.includes("riesgo electrico") ||
+      t.includes("eléctr") ||
+      t.includes("electr");
+    const inDraft =
+      d.includes("distancias") ||
+      d.includes("arco") ||
+      d.includes("dielec") ||
+      d.includes("epp") ||
+      d.includes("sobretension") ||
+      d.includes("sobretensión");
+    return inTitle || inDraft;
+  }, [latestDoc?.activity.title, replyDraft]);
   const [pendingFinalize, setPendingFinalize] = useState<{
     originalName: string;
     key: string;
@@ -830,6 +847,11 @@ export function RequirementActions({ activityId, status, rejectionReason, activi
               maxLength={5000}
               className="text-base"
             />
+            {showAiElectricalSuggestion ? (
+              <div className="rounded-xl border border-sky-200 bg-sky-50 p-3 text-sm text-sky-900">
+                Sugerencia de IA: Según la normativa, se requiere verificación de EPP dieléctricos inmediatamente.
+              </div>
+            ) : null}
             <div className="flex items-center justify-between text-xs text-slate-500">
               <span>{replyDraft.trim().length} caracteres</span>
               {replyError ? <span className="text-red-600">{replyError}</span> : <span />}

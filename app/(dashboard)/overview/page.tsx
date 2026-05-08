@@ -94,7 +94,15 @@ export default async function OverviewPage({
           {
             collaboratorId: null,
             inspectionEquipmentId: null,
-            project: { is: { ...projectScope, sections: { some: { sectionKey: "requirements", enabled: true } } } },
+            project: {
+              is: {
+                ...projectScope,
+                OR: [
+                  { sections: { some: { sectionKey: "requirements", enabled: true } } },
+                  { sections: { none: {} } },
+                ],
+              },
+            },
           },
           {
             collaboratorId: { not: null },
@@ -120,7 +128,15 @@ export default async function OverviewPage({
           {
             collaboratorId: null,
             inspectionEquipmentId: null,
-            project: { is: { ...projectScope, sections: { some: { sectionKey: "requirements", enabled: true } } } },
+            project: {
+              is: {
+                ...projectScope,
+                OR: [
+                  { sections: { some: { sectionKey: "requirements", enabled: true } } },
+                  { sections: { none: {} } },
+                ],
+              },
+            },
           },
           {
             collaboratorId: { not: null },
@@ -146,7 +162,15 @@ export default async function OverviewPage({
           {
             collaboratorId: null,
             inspectionEquipmentId: null,
-            project: { is: { ...projectScope, sections: { some: { sectionKey: "requirements", enabled: true } } } },
+            project: {
+              is: {
+                ...projectScope,
+                OR: [
+                  { sections: { some: { sectionKey: "requirements", enabled: true } } },
+                  { sections: { none: {} } },
+                ],
+              },
+            },
           },
           {
             collaboratorId: { not: null },
@@ -172,7 +196,15 @@ export default async function OverviewPage({
           {
             collaboratorId: null,
             inspectionEquipmentId: null,
-            project: { is: { ...projectScope, sections: { some: { sectionKey: "requirements", enabled: true } } } },
+            project: {
+              is: {
+                ...projectScope,
+                OR: [
+                  { sections: { some: { sectionKey: "requirements", enabled: true } } },
+                  { sections: { none: {} } },
+                ],
+              },
+            },
           },
           {
             collaboratorId: { not: null },
@@ -197,7 +229,15 @@ export default async function OverviewPage({
           {
             collaboratorId: null,
             inspectionEquipmentId: null,
-            project: { is: { ...projectScope, sections: { some: { sectionKey: "requirements", enabled: true } } } },
+            project: {
+              is: {
+                ...projectScope,
+                OR: [
+                  { sections: { some: { sectionKey: "requirements", enabled: true } } },
+                  { sections: { none: {} } },
+                ],
+              },
+            },
           },
           {
             collaboratorId: { not: null },
@@ -211,6 +251,7 @@ export default async function OverviewPage({
       },
       select: {
         id: true,
+        title: true,
         status: true,
         priority: true,
         updatedAt: true,
@@ -225,6 +266,11 @@ export default async function OverviewPage({
             name: true,
             role: true,
           },
+        },
+        replies: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          select: { message: true },
         },
         project: {
           select: {
@@ -338,6 +384,8 @@ export default async function OverviewPage({
 
   const activities = recentActivities.map((activity) => ({
     id: activity.id,
+    title: activity.title,
+    latestReplyMessage: activity.replies?.[0]?.message ?? null,
     status: activity.status,
     priority: activity.priority,
     updatedAt: activity.updatedAt.toISOString(),

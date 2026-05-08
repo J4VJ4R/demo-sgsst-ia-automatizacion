@@ -1003,6 +1003,7 @@ export function LearningPageClient(props: {
   currentUser: { id: string; name: string; role: UserRole };
   projects: ProjectOption[];
   initialProjectId: string | null;
+  aiBanner?: { message: string; courseTitle: string } | null;
 }) {
   const [projectId, setProjectId] = useState(props.initialProjectId);
   const isStudentOnly = props.currentUser.role === "STUDENT";
@@ -1139,6 +1140,12 @@ export function LearningPageClient(props: {
           ) : null}
         </div>
       </div>
+
+      {isStudentOnly && props.aiBanner ? (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          {props.aiBanner.message}.
+        </div>
+      ) : null}
 
       {!projectId ? (
         <Card>

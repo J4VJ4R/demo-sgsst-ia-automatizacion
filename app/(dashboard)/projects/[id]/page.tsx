@@ -72,6 +72,11 @@ export default async function ProjectDetailPage({
       dueDate: true,
       periodicity: true,
       assignedToId: true,
+      replies: {
+        orderBy: { createdAt: "desc" },
+        take: 1,
+        select: { message: true },
+      },
       documents: {
         where: { deletedAt: null },
         orderBy: { uploadedAt: "desc" },
@@ -607,6 +612,7 @@ export default async function ProjectDetailPage({
                   dueDate: a.dueDate ? a.dueDate.toISOString() : null,
                   periodicity: a.periodicity ?? null,
                   assignedToId: a.assignedToId,
+                  latestReplyMessage: a.replies?.[0]?.message ?? null,
                   documents: a.documents.map((d) => ({
                     id: d.id,
                     name: d.name,
@@ -618,6 +624,7 @@ export default async function ProjectDetailPage({
                   })),
                 }))}
                 projectName={project.name}
+                projectId={project.id}
                 canManageActivities={!!(isAdmin || isProjectConsultant || isProjectClient)}
                 isAdmin={isAdmin}
                 consultantUsers={potentialAssignees}

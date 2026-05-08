@@ -4,6 +4,7 @@ import {
   GraduationCap,
   HelpCircle,
   LayoutDashboard,
+  Settings,
   Users,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -60,6 +61,13 @@ const NAV_ITEMS = [
     icon: HelpCircle,
     roles: ["ADMIN_PMD", "CONSULTANT", "CLIENT", "CLIENT_VIEWER", "STUDENT"] as const,
     priority: 60,
+  },
+  {
+    title: "Configuración",
+    href: "/settings",
+    icon: Settings,
+    roles: ["ADMIN_PMD", "CONSULTANT", "CLIENT", "CLIENT_VIEWER", "STUDENT"] as const,
+    priority: 70,
   },
 ] satisfies DashboardNavItem[];
 

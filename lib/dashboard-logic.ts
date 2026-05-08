@@ -1,6 +1,8 @@
 
 export type ActivitySummary = {
   id: string;
+  title?: string | null;
+  latestReplyMessage?: string | null;
   status: string;
   priority: string | null;
   updatedAt: string;
