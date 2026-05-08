@@ -255,7 +255,7 @@ export function computeAiRiskSummary(
           SOBRETENSION: 0,
         },
         activitiesSeen: new Set<string>(),
-      } as const);
+      });
 
     entry.activitiesSeen.add(src.activityId);
     for (const f of classified) {
