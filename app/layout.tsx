@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+const boltSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#38bdf8"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs><path d="M38 4 14 36h16l-4 24 28-38H38z" fill="url(#g)"/></svg>`;
+const boltIcon = `data:image/svg+xml,${encodeURIComponent(boltSvg)}`;
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -37,8 +40,8 @@ export const metadata: Metadata = {
     images: ["/img/sg-sst-ia-logo.svg"],
   },
   icons: {
-    icon: "/img/favicon.ico",
-    shortcut: "/img/favicon.ico",
+    icon: boltIcon,
+    shortcut: boltIcon,
     apple: "/img/sg-sst-ia-mark.svg",
   },
 };
