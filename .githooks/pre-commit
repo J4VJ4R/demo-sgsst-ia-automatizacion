@@ -1,0 +1,47 @@
+#!/bin/sh
+set -eu
+
+current_branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")"
+
+if [ "${current_branch}" != "main" ]; then
+  exit 0
+fi
+
+if [ "${PMD_ALLOW_MAIN_COMMIT:-}" = "YES" ]; then
+  exit 0
+fi
+
+cat 1>&2 <<EOF
+
+Advertencia: estás intentando hacer commit directamente en 'main'.
+
+Flujo recomendado:
+- Trabajar en 'dev'
+- Probar cambios
+- Luego pasar a 'main'
+
+EOF
+
+# Si no hay terminal interactiva, bloquea por defecto.
+if [ ! -t 0 ]; then
+  cat 1>&2 <<EOF
+Bloqueado por seguridad (sesión no interactiva).
+Para continuar una sola vez:
+  PMD_ALLOW_MAIN_COMMIT=YES git commit -m "tu mensaje"
+EOF
+  exit 1
+fi
+
+printf "¿Confirmas commit en 'main'? Escribe 'SI' para continuar: " 1>&2
+read -r answer
+
+if [ "${answer}" != "SI" ]; then
+  cat 1>&2 <<EOF
+Commit cancelado.
+Sugerencia:
+  git checkout -b dev
+EOF
+  exit 1
+fi
+
+exit 0

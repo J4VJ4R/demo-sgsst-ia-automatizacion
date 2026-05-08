@@ -1,0 +1,734 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                       String            @id @default(uuid())
+  email                    String            @unique
+  name                     String
+  role                     String            @default("CONSULTANT")
+  password                 String            @default("123456")
+  image                    String?
+  deletedAt                DateTime?
+  activitiesManaged        Activity[]
+  accidentalidadAssigned   AccidentalidadEmpresa[] @relation("AccidentalidadAssignedTo")
+  projectsConsulted        Project[]         @relation("ProjectConsultant")
+  clientProjects           Project[]         @relation("ProjectClient")
+  activityHistoryEntries   ActivityHistory[] @relation("UserActivityHistory")
+  uploadedDocuments        Document[]
+  activityReplies   ActivityReply[] @relation("ActivityReplyCreatedBy")
+  uploadedAccidentalidadFiles ArchivoAccidentalidad[] @relation("UserAccidentalidadUploads")
+  uploadedSgSstDesignFiles SgSstDesignFile[] @relation("UserSgSstDesignUploads")
+  uploadedInspectionEquipmentPhotos InspectionEquipmentPhoto[] @relation("UserInspectionEquipmentUploads")
+  minimumIndicatorMeasurements MinimumIndicatorMeasurement[] @relation("UserMinimumIndicatorMeasurements")
+  accidentalidadHistoryEntries HistorialAccidentalidad[] @relation("UserAccidentalidadHistory")
+  uploadedCustomSectionActivityDocuments CustomProjectSectionActivityDocument[] @relation("UserCustomSectionActivityUploads")
+  notifications            Notification[]    @relation("UserNotifications")
+  notificationAudits       NotificationAudit[] @relation("UserNotificationAudits")
+  learningCoursesCreated   LearningCourse[]  @relation("LearningCourseCreatedBy")
+  learningCourseEnrollments LearningCourseEnrollment[] @relation("LearningCourseEnrollmentStudent")
+  learningCourseEnrollmentsAssigned LearningCourseEnrollment[] @relation("LearningCourseEnrollmentAssignedBy")
+  learningModuleProgress   LearningModuleProgress[]
+  learningExamAttempts     LearningExamAttempt[]
+  learningCertificates     LearningCertificate[]
+
+  @@index([deletedAt])
+}
+
+model Notification {
+  id             String   @id @default(uuid())
+  recipientId    String
+  recipient      User     @relation("UserNotifications", fields: [recipientId], references: [id])
+  title          String
+  message        String
+  type           String   // ACTIVITY_STATUS, SYSTEM_ALERT
+  priority       String   // HIGH, MEDIUM, LOW
+  category       String?  // OPERATIONAL, ADMINISTRATIVE
+  functionalArea String?  // SST
+  
+  isRead         Boolean  @default(false)
+  
+  activityId     String?
+  activity       Activity? @relation(fields: [activityId], references: [id])
+  
+  createdAt      DateTime @default(now())
+  
+  audits         NotificationAudit[]
+}
+
+model NotificationAudit {
+  id             String       @id @default(uuid())
+  notificationId String
+  notification   Notification @relation(fields: [notificationId], references: [id])
+  userId         String
+  user           User         @relation("UserNotificationAudits", fields: [userId], references: [id])
+  action         String       // FETCHED, READ, DISMISSED
+  timestamp      DateTime     @default(now())
+  metadata       String?
+}
+
+model Project {
+  id            String    @id @default(uuid())
+  name          String
+  clientName    String
+  description   String?
+  startDate     DateTime  @default(now())
+  status        String    @default("ACTIVE")
+  consultantId  String?
+  consultant    User?     @relation("ProjectConsultant", fields: [consultantId], references: [id])
+  clientUserId  String?
+  clientUser    User?     @relation("ProjectClient", fields: [clientUserId], references: [id])
+  rfc           String?
+  contactEmail  String?
+  contactPhone  String?
+  economicActivity String? // Actividad económica
+  ciiu             String? // Clasificación Industrial Internacional Uniforme (4 dígitos)
+  contractStartDate DateTime? // Fecha de inicio del contrato
+  contractNumber   Int?      @unique // Número de contrato (numérico y único)
+  riskLevel        String?   // Nivel de riesgo (1-5)
+  nit              String?   @unique // Número de Identificación Tributaria
+  address          String?   // Dirección
+  department       String?   // Departamento
+  municipality     String?   // Municipio
+  phone            String?   // Teléfono
+  workerCount      Int?      // Número de trabajadores
+  logoUrl          String?   // URL del logo de la empresa
+  chapter          String?   // Capítulo seleccionado
+  activities    Activity[]
+  collaborators Collaborator[]
+  accidentalidad AccidentalidadEmpresa[]
+  sgsstDesignSections SgSstDesignSection[]
+  sections ProjectSection[]
+  inspectionEquipments InspectionEquipment[]
+  vehicleInspectionVehicles VehicleInspectionVehicle[]
+  driverInspectionDrivers DriverInspectionDriver[]
+  minimumIndicators MinimumIndicator[]
+  customSections CustomProjectSection[]
+  learningCourses LearningCourse[]
+}
+
+model Collaborator {
+  id                   String   @id @default(uuid())
+  projectId            String
+  project              Project  @relation(fields: [projectId], references: [id])
+  documentType         String
+  documentNumber       String
+  firstName            String
+  secondName           String?
+  firstSurname         String
+  secondSurname        String?
+  startDate            DateTime
+  contractType         String
+  position             String
+  driverRole           String?
+  email                String
+  phone                String
+  address              String
+  rh                   String
+  eps                  String
+  arl                  String
+  afp                  String
+  emergencyContactName String
+  emergencyContactPhone String
+  status               String   @default("ACTIVE")
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  activities           Activity[]
+  drivenVehicleInspections VehicleInspectionVehicle[] @relation("DriverForVehicleInspection")
+
+  @@index([projectId])
+}
+
+model Activity {
+  id           String         @id @default(uuid())
+  title        String
+  status       String         @default("PENDING")
+  priority     String         @default("Baja")
+  rejectionReason String?
+  returnedNote String?
+  returnedAt   DateTime?
+  dueDate      DateTime?
+  periodicity  String?
+  projectId    String
+  project      Project        @relation(fields: [projectId], references: [id])
+  assignedToId String?
+  assignedTo   User?          @relation(fields: [assignedToId], references: [id])
+   collaboratorId String?
+   collaborator   Collaborator? @relation(fields: [collaboratorId], references: [id])
+  inspectionEquipmentId String?
+  inspectionEquipment   InspectionEquipment? @relation(fields: [inspectionEquipmentId], references: [id])
+  documents    Document[]
+  replies      ActivityReply[]
+  updatedAt    DateTime       @updatedAt @default(now())
+  history      ActivityHistory[]
+  notifications Notification[]
+
+  @@index([projectId])
+  @@index([collaboratorId])
+  @@index([inspectionEquipmentId])
+  @@index([status])
+  @@index([returnedAt])
+}
+
+model InspectionEquipment {
+  id                     String   @id @default(uuid())
+  projectId              String
+  project                Project  @relation(fields: [projectId], references: [id])
+  name                   String
+  code                   String?
+  location               String?
+  brand                  String?
+  model                  String?
+  serial                 String?
+  teamResponsible        String
+  teamUser               String
+  verificationPeriodicity String
+  maintenancePeriodicity  String
+  observations           String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  photos                 InspectionEquipmentPhoto[]
+  activities             Activity[]
+
+  @@index([projectId])
+  @@map("inspection_equipment")
+}
+
+model InspectionEquipmentPhoto {
+  id            String   @id @default(uuid())
+  equipmentId   String
+  equipment     InspectionEquipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+  name          String
+  url           String
+  key           String
+  sizeBytes     Int?
+  uploadedAt    DateTime @default(now())
+  uploadedByUserId String?
+  uploadedByUser   User?    @relation("UserInspectionEquipmentUploads", fields: [uploadedByUserId], references: [id])
+  deletedAt     DateTime?
+
+  @@index([equipmentId])
+  @@index([deletedAt])
+  @@map("inspection_equipment_photo")
+}
+
+model VehicleInspectionVehicle {
+  id               String   @id @default(uuid())
+  projectId         String
+  project           Project  @relation(fields: [projectId], references: [id])
+
+  verificationDate  DateTime
+  plate             String
+  vin               String?
+  engineNumber      String?
+  model             String?
+  transitLicense    String?
+  brand             String?
+  line              String?
+  displacement      String?
+  color             String?
+  mileage           String?
+
+  ownerName         String?
+  ownerId           String?
+
+  driverCollaboratorId String?
+  driverCollaborator   Collaborator? @relation("DriverForVehicleInspection", fields: [driverCollaboratorId], references: [id])
+
+  soatDueDate        DateTime?
+  rtmDueDate         DateTime?
+
+  documents          VehicleInspectionDocument[]
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([driverCollaboratorId])
+  @@map("vehicle_inspection_vehicle")
+}
+
+model VehicleInspectionDocument {
+  id          String   @id @default(uuid())
+  vehicleId   String
+  vehicle     VehicleInspectionVehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  kind        String
+  name        String
+  url         String
+  key         String
+  sizeBytes   Int?
+  uploadedAt  DateTime @default(now())
+  deletedAt   DateTime?
+
+  @@index([vehicleId])
+  @@index([deletedAt])
+  @@map("vehicle_inspection_document")
+}
+
+model DriverInspectionDriver {
+  id            String   @id @default(uuid())
+  projectId     String
+  project       Project  @relation(fields: [projectId], references: [id])
+
+  fullName      String
+  documentType  String
+  documentNumber String
+  position      String?
+
+  licenseCategory String?
+  licenseDueDate  DateTime?
+  licenseStatus   String?   // Alta / Media / Baja
+
+  roadSafetyTraining Boolean? // true/false/null
+
+  evaluationDueDate DateTime?
+  vehiclePlate      String?
+  missionTripsPlanner String?
+
+  documents     DriverInspectionDocument[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([documentNumber])
+  @@map("driver_inspection_driver")
+}
+
+model DriverInspectionDocument {
+  id          String   @id @default(uuid())
+  driverId    String
+  driver      DriverInspectionDriver @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  kind        String
+  name        String
+  url         String
+  key         String
+  sizeBytes   Int?
+  uploadedAt  DateTime @default(now())
+  deletedAt   DateTime?
+
+  @@index([driverId])
+  @@index([deletedAt])
+  @@map("driver_inspection_document")
+}
+
+model Document {
+  id               String   @id @default(uuid())
+  name             String
+  url              String
+  uploadedAt       DateTime @default(now())
+  activityId       String
+  activity         Activity @relation(fields: [activityId], references: [id])
+  version          Int      @default(1)
+  sizeBytes        Int?
+  uploadedByUserId String?
+  uploadedByUser   User?    @relation(fields: [uploadedByUserId], references: [id])
+  replies          ActivityReply[]
+  deletedAt        DateTime?
+
+  @@index([activityId])
+}
+
+model ActivityReply {
+  id              String   @id @default(uuid())
+  activityId      String
+  documentId      String
+  adminMessage    String?
+  message         String
+  createdAt       DateTime @default(now())
+  createdByUserId String
+  createdByUser   User     @relation("ActivityReplyCreatedBy", fields: [createdByUserId], references: [id])
+  isRead          Boolean  @default(false)
+  readAt          DateTime?
+
+  activity Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([activityId])
+  @@index([documentId])
+  @@index([isRead])
+}
+
+model ActivityHistory {
+  id               String   @id @default(uuid())
+  activityId       String
+  activity         Activity @relation(fields: [activityId], references: [id])
+  field            String   // "assignedTo" | "priority" | "status"
+  oldValue         String?
+  newValue         String
+  changedByUserId  String
+  changedBy        User     @relation("UserActivityHistory", fields: [changedByUserId], references: [id])
+  changedAt        DateTime @default(now())
+}
+
+model AccidentalidadEmpresa {
+  id          String   @id @default(uuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id])
+  actividad   String
+  status      String   @default("PENDING")
+  priority    String   @default("Cumplido")
+  dueDate     DateTime
+  assignedToId String?
+  assignedTo   User?    @relation("AccidentalidadAssignedTo", fields: [assignedToId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt @default(now())
+
+  archivos    ArchivoAccidentalidad[]
+  historial   HistorialAccidentalidad[]
+
+  @@index([projectId])
+  @@index([status])
+  @@index([assignedToId])
+  @@map("accidentalidad_empresa")
+}
+
+model ArchivoAccidentalidad {
+  id                     String   @id @default(uuid())
+  accidentalidadId       String
+  accidentalidad         AccidentalidadEmpresa @relation(fields: [accidentalidadId], references: [id])
+  name                   String
+  url                    String
+  uploadedAt             DateTime @default(now())
+  version                Int      @default(1)
+  sizeBytes              Int?
+  uploadedByUserId       String?
+  uploadedByUser         User?    @relation("UserAccidentalidadUploads", fields: [uploadedByUserId], references: [id])
+  deletedAt              DateTime?
+
+  @@index([accidentalidadId])
+  @@map("archivos_accidentalidad")
+}
+
+model HistorialAccidentalidad {
+  id               String   @id @default(uuid())
+  accidentalidadId String
+  accidentalidad   AccidentalidadEmpresa @relation(fields: [accidentalidadId], references: [id])
+  field            String
+  oldValue         String?
+  newValue         String
+  changedByUserId  String
+  changedBy        User     @relation("UserAccidentalidadHistory", fields: [changedByUserId], references: [id])
+  changedAt        DateTime @default(now())
+
+  @@index([accidentalidadId])
+  @@map("historial_accidentalidad")
+}
+
+model SgSstDesignSection {
+  id        String   @id @default(uuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  name      String
+  sortOrder Int      @default(0)
+  isDefault Boolean  @default(false)
+  dueDate   DateTime? @map("fecha_vencimiento")
+  dueStatus String   @default("Cumplido") @map("estado_vencimiento")
+  periodicity String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  files     SgSstDesignFile[]
+
+  @@index([projectId])
+  @@index([sortOrder])
+  @@map("sgsst_design_section")
+}
+
+model SgSstDesignFile {
+  id             String            @id @default(uuid())
+  sectionId      String
+  section        SgSstDesignSection @relation(fields: [sectionId], references: [id])
+  name           String
+  url            String
+  key            String
+  uploadedAt     DateTime          @default(now())
+  version        Int               @default(1)
+  sizeBytes      Int?
+  uploadedByUserId String?
+  uploadedByUser User?             @relation("UserSgSstDesignUploads", fields: [uploadedByUserId], references: [id])
+  deletedAt      DateTime?
+
+  @@index([sectionId])
+  @@index([deletedAt])
+  @@map("sgsst_design_file")
+}
+
+model ProjectSection {
+  id          String   @id @default(uuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sectionKey  String
+  enabled     Boolean  @default(false)
+  enabledAt   DateTime?
+  enabledBy   String?
+  disabledAt  DateTime?
+  disabledBy  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([projectId, sectionKey])
+  @@index([projectId])
+  @@index([sectionKey])
+  @@map("project_section")
+}
+
+model CustomProjectSection {
+  id         String   @id @default(uuid())
+  projectId  String
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name       String
+  enabled    Boolean  @default(true)
+  enabledAt  DateTime?
+  enabledBy  String?
+  disabledAt DateTime?
+  disabledBy String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  activities CustomProjectSectionActivity[]
+
+  @@index([projectId])
+  @@index([enabled])
+  @@map("custom_project_section")
+}
+
+model CustomProjectSectionActivity {
+  id                 String   @id @default(uuid())
+  sectionId           String
+  section             CustomProjectSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  name               String
+  dueDate            DateTime?
+
+  documentName       String?
+  documentUrl        String?
+  documentKey        String?
+  documentSizeBytes  Int?
+  documentUploadedAt DateTime?
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  deletedAt          DateTime?
+
+  documents          CustomProjectSectionActivityDocument[]
+
+  @@index([sectionId])
+  @@index([dueDate])
+  @@index([deletedAt])
+  @@map("custom_project_section_activity")
+}
+
+model CustomProjectSectionActivityDocument {
+  id               String   @id @default(uuid())
+  activityId       String
+  activity         CustomProjectSectionActivity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  name             String
+  url              String
+  key              String
+  sizeBytes        Int?
+  uploadedAt       DateTime @default(now())
+  uploadedByUserId String?
+  uploadedByUser   User?    @relation("UserCustomSectionActivityUploads", fields: [uploadedByUserId], references: [id])
+  version          Int      @default(1)
+  deletedAt        DateTime?
+
+  @@index([activityId])
+  @@index([deletedAt])
+  @@map("custom_project_section_activity_document")
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  action      String
+  entity      String
+  entityId    String
+  details     String?
+  performedBy String
+  createdAt   DateTime @default(now())
+}
+
+model MinimumIndicator {
+  id            String   @id @default(uuid())
+  projectId     String
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name          String
+  description   String?
+  type          String?
+  unit          String
+  periodicity   String
+  targetPercent Float
+  formula       String
+  variablesJson String   @default("[]")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime?
+
+  measurements  MinimumIndicatorMeasurement[]
+
+  @@index([projectId])
+  @@index([deletedAt])
+  @@map("minimum_indicator")
+}
+
+model MinimumIndicatorMeasurement {
+  id             String   @id @default(uuid())
+  indicatorId    String
+  indicator      MinimumIndicator @relation(fields: [indicatorId], references: [id], onDelete: Cascade)
+  periodStart    DateTime
+  periodEnd      DateTime
+  inputsJson     String   @default("{}")
+  resultAnalysis String?
+  computedValue  Float
+  compliancePct  Float
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  createdByUserId String?
+  createdByUser  User?    @relation("UserMinimumIndicatorMeasurements", fields: [createdByUserId], references: [id])
+  deletedAt      DateTime?
+
+  @@index([indicatorId])
+  @@index([periodStart])
+  @@index([deletedAt])
+  @@map("minimum_indicator_measurement")
+}
+
+model LearningCourse {
+  id              String   @id @default(uuid())
+  projectId        String
+  project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title            String
+  description      String?
+  coverUrl         String?
+  coverKey         String?
+  coverSizeBytes   Int?
+  certificateEnabled Boolean @default(true)
+  createdByUserId  String
+  createdByUser    User     @relation("LearningCourseCreatedBy", fields: [createdByUserId], references: [id])
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  deletedAt        DateTime?
+
+  modules          LearningModule[]
+  exam             LearningExam?
+  certificates     LearningCertificate[]
+  enrollments      LearningCourseEnrollment[]
+
+  @@index([projectId])
+  @@index([deletedAt])
+  @@map("learning_course")
+}
+
+model LearningCourseEnrollment {
+  id              String   @id @default(uuid())
+  courseId        String
+  course          LearningCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User     @relation("LearningCourseEnrollmentStudent", fields: [userId], references: [id], onDelete: Cascade)
+  assignedByUserId String?
+  assignedByUser  User?    @relation("LearningCourseEnrollmentAssignedBy", fields: [assignedByUserId], references: [id], onDelete: SetNull)
+  assignedAt      DateTime @default(now())
+
+  @@unique([courseId, userId])
+  @@index([userId])
+  @@map("learning_course_enrollment")
+}
+
+model LearningModule {
+  id             String   @id @default(uuid())
+  courseId       String
+  course         LearningCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title          String
+  description    String?
+  order          Int
+  youtubeVideoId String
+  materialsJson  String   @default("[]")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  progress       LearningModuleProgress[]
+
+  @@index([courseId])
+  @@index([order])
+  @@map("learning_module")
+}
+
+model LearningModuleProgress {
+  id          String   @id @default(uuid())
+  moduleId    String
+  module      LearningModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  completedAt DateTime @default(now())
+
+  @@unique([moduleId, userId])
+  @@index([userId])
+  @@map("learning_module_progress")
+}
+
+model LearningExam {
+  id                 String   @id @default(uuid())
+  courseId           String   @unique
+  course             LearningCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  passingScorePercent Int     @default(70)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  questions          LearningExamQuestion[]
+  attempts           LearningExamAttempt[]
+
+  @@map("learning_exam")
+}
+
+model LearningExamQuestion {
+  id        String   @id @default(uuid())
+  examId    String
+  exam      LearningExam @relation(fields: [examId], references: [id], onDelete: Cascade)
+  prompt    String
+  optionsJson String
+  correctIndex Int
+  order     Int     @default(0)
+
+  @@index([examId])
+  @@index([order])
+  @@map("learning_exam_question")
+}
+
+model LearningExamAttempt {
+  id           String   @id @default(uuid())
+  examId       String
+  exam         LearningExam @relation(fields: [examId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scorePercent Int
+  passed       Boolean
+  createdAt    DateTime @default(now())
+
+  certificate  LearningCertificate?
+
+  @@index([examId])
+  @@index([userId])
+  @@map("learning_exam_attempt")
+}
+
+model LearningCertificate {
+  id         String   @id @default(uuid())
+  courseId   String
+  course     LearningCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  attemptId  String?  @unique
+  attempt    LearningExamAttempt? @relation(fields: [attemptId], references: [id], onDelete: SetNull)
+  issuedAt   DateTime @default(now())
+
+  @@unique([courseId, userId])
+  @@index([userId])
+  @@map("learning_certificate")
+}

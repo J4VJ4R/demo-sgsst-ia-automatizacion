@@ -1,0 +1,61 @@
+#!/bin/sh
+set -eu
+
+remote_name="${1:-}"
+remote_url="${2:-}"
+
+is_main_push=0
+changed_db_files=0
+changed_files=""
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  if [ "${remote_ref}" = "refs/heads/main" ]; then
+    is_main_push=1
+    if [ "${remote_sha}" = "0000000000000000000000000000000000000000" ]; then
+      changed_files="$(git diff --name-only "${local_sha}" || true)"
+    else
+      changed_files="$(git diff --name-only "${remote_sha}" "${local_sha}" || true)"
+    fi
+    break
+  fi
+done
+
+if [ "${is_main_push}" -ne 1 ]; then
+  exit 0
+fi
+
+db_globs='(^prisma/schema\.prisma$|^prisma/schema\.prod\.prisma$|^prisma/migrations/|^prisma/migration_lock\.toml$)'
+
+if printf "%s\n" "${changed_files}" | grep -Eq "${db_globs}"; then
+  changed_db_files=1
+fi
+
+if [ "${changed_db_files}" -ne 1 ]; then
+  exit 0
+fi
+
+if [ "${PMD_ALLOW_DB_PUSH:-}" = "YES" ]; then
+  exit 0
+fi
+
+cat 1>&2 <<EOF
+
+Bloqueado: intento de push a 'main' con cambios que afectan base de datos.
+
+Remote: ${remote_name} ${remote_url}
+
+Archivos detectados:
+$(printf "%s\n" "${changed_files}" | grep -E "${db_globs}" || true)
+
+Requisitos antes de continuar:
+- Backup/Snapshot de producción realizado y verificado.
+- Aprobación explícita.
+
+Para permitir el push una sola vez (en esta terminal):
+  PMD_ALLOW_DB_PUSH=YES git push origin main
+
+Checklist: docs/PROD_DB_PUSH_GUARDRAIL.md
+EOF
+
+exit 1
+
