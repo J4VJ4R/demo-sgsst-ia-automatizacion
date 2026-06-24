@@ -33,6 +33,89 @@ const curlExample = `curl -X POST "https://tu-dominio.vercel.app/api/mobile/auth
   -H "Content-Type: application/json" ^
   -d "{\\"email\\":\\"admin@autoavanzada.com\\",\\"password\\":\\"demo2026\\"}"`;
 
+const postmanLoginExample = `POST {{baseUrl}}/api/mobile/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@autoavanzada.com",
+  "password": "demo2026"
+}`;
+
+const postmanProjectDetailExample = `GET {{baseUrl}}/api/mobile/projects/{{projectId}}
+Authorization: Bearer {{token}}`;
+
+const postmanReplyExample = `POST {{baseUrl}}/api/mobile/activities/{{activityId}}/reply
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "replyMessage": "Se adjunta nueva evidencia para revision.",
+  "dueDate": "2026-05-30",
+  "files": [
+    {
+      "originalName": "evidencia-ajustada.pdf",
+      "key": "activities/{{activityId}}/archivo-generado.pdf",
+      "fileSize": 245760
+    }
+  ]
+}`;
+
+const uploadFlowExample = `1. POST /api/mobile/activities/{activityId}/upload-request
+2. Flutter sube el archivo a uploadUrl
+3. POST /api/mobile/activities/{activityId}/reply
+
+{
+  "replyMessage": "Se ajusta evidencia y se responde devolucion.",
+  "dueDate": "2026-05-30",
+  "files": [
+    {
+      "originalName": "evidencia-riesgo-electrico.pdf",
+      "key": "activities/{activityId}/archivo-generado.pdf",
+      "fileSize": 245760
+    }
+  ]
+}`;
+
+const flutterServiceExample = `class MobileApiService {
+  MobileApiService({
+    required this.baseUrl,
+    required this.tokenProvider,
+  });
+
+  final String baseUrl;
+  final Future<String?> Function() tokenProvider;
+
+  Future<Map<String, String>> _headers() async {
+    final token = await tokenProvider();
+    return {
+      'Content-Type': 'application/json',
+      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+    };
+  }
+
+  Future<http.Response> login(String email, String password) {
+    return http.post(
+      Uri.parse('$baseUrl/api/mobile/auth/login'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email, 'password': password}),
+    );
+  }
+
+  Future<http.Response> getProjects() async {
+    return http.get(
+      Uri.parse('$baseUrl/api/mobile/projects'),
+      headers: await _headers(),
+    );
+  }
+
+  Future<http.Response> getActivityDetail(String activityId) async {
+    return http.get(
+      Uri.parse('$baseUrl/api/mobile/activities/$activityId'),
+      headers: await _headers(),
+    );
+  }
+}`;
+
 const endpoints = [
   {
     method: "POST",
@@ -68,6 +151,31 @@ const endpoints = [
     method: "GET",
     path: "/api/mobile/notifications?unreadOnly=true&limit=20",
     description: "Lista notificaciones del usuario autenticado.",
+  },
+  {
+    method: "GET",
+    path: "/api/mobile/projects/{projectId}",
+    description: "Detalle de empresa con secciones, resumen y actividades recientes.",
+  },
+  {
+    method: "GET",
+    path: "/api/mobile/activities/{activityId}",
+    description: "Detalle completo de actividad con documentos, replies e historial.",
+  },
+  {
+    method: "POST",
+    path: "/api/mobile/notifications/{notificationId}/read",
+    description: "Marca una notificacion como leida desde la app movil.",
+  },
+  {
+    method: "POST",
+    path: "/api/mobile/activities/{activityId}/upload-request",
+    description: "Genera URL firmada para subir evidencia desde Flutter a S3.",
+  },
+  {
+    method: "POST",
+    path: "/api/mobile/activities/{activityId}/reply",
+    description: "Registra respuesta del consultor con mensaje y archivos ya subidos.",
   },
 ];
 
@@ -178,6 +286,67 @@ export function MobileApiDocs() {
             <li>- Esta API es demo y sirve para avanzar el app Android/iOS mientras se completa la capa final.</li>
           </ul>
         </div>
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-3">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="mb-3 text-lg font-semibold text-slate-900">Postman: login</div>
+          <p className="mb-4 text-sm text-slate-600">
+            Guarda `baseUrl` como variable de coleccion y usa este request para obtener el token inicial.
+          </p>
+          <pre className="overflow-x-auto rounded-xl bg-slate-950 p-4 text-sm text-slate-100">
+            <code>{postmanLoginExample}</code>
+          </pre>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="mb-3 text-lg font-semibold text-slate-900">Postman: detalle de empresa</div>
+          <p className="mb-4 text-sm text-slate-600">
+            Despues del login, guarda `token` y `projectId` como variables para consultar el detalle.
+          </p>
+          <pre className="overflow-x-auto rounded-xl bg-slate-950 p-4 text-sm text-slate-100">
+            <code>{postmanProjectDetailExample}</code>
+          </pre>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="mb-3 text-lg font-semibold text-slate-900">Postman: reply con evidencia</div>
+          <p className="mb-4 text-sm text-slate-600">
+            Este request se usa despues de subir el archivo al `uploadUrl` recibido en `upload-request`.
+          </p>
+          <pre className="overflow-x-auto rounded-xl bg-slate-950 p-4 text-sm text-slate-100">
+            <code>{postmanReplyExample}</code>
+          </pre>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="mb-3 text-lg font-semibold text-slate-900">Guia rapida para Flutter</div>
+        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <div>
+            <ul className="space-y-2 text-sm text-slate-700">
+              <li>- Crear un servicio centralizado para login, proyectos, actividades y notificaciones.</li>
+              <li>- Guardar el token en `flutter_secure_storage` o equivalente seguro.</li>
+              <li>- Enviar `Authorization: Bearer token` en todas las rutas privadas.</li>
+              <li>- Para evidencias, primero llamar `upload-request`, luego subir binario y al final registrar `reply`.</li>
+              <li>- Mapear las respuestas JSON a modelos simples como `MobileUser`, `MobileProject` y `MobileActivity`.</li>
+            </ul>
+          </div>
+          <pre className="overflow-x-auto rounded-xl bg-slate-950 p-4 text-sm text-slate-100">
+            <code>{flutterServiceExample}</code>
+          </pre>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="mb-3 text-lg font-semibold text-slate-900">Fase 2: flujo de respuesta con evidencias</div>
+        <p className="mb-4 text-sm text-slate-600">
+          Este flujo permite que Flutter atienda devoluciones: pide una URL firmada, sube el archivo y luego registra la
+          respuesta final contra la actividad.
+        </p>
+        <pre className="overflow-x-auto rounded-xl bg-slate-950 p-4 text-sm text-slate-100">
+          <code>{uploadFlowExample}</code>
+        </pre>
       </section>
     </div>
   );

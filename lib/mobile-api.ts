@@ -23,3 +23,18 @@ export function canSeeProject(user: { id: string; role: string }, project: { con
     ((user.role === "CLIENT" || user.role === "CLIENT_VIEWER") && project.clientUserId === user.id)
   );
 }
+
+export function canManageProject(user: { id: string; role: string }, project: { consultantId?: string | null }) {
+  return isAdminRole(user.role) || (user.role === "CONSULTANT" && project.consultantId === user.id);
+}
+
+export function canUploadActivityEvidence(
+  user: { id: string; role: string },
+  project: { consultantId?: string | null; clientUserId?: string | null }
+) {
+  return (
+    isAdminRole(user.role) ||
+    (user.role === "CONSULTANT" && project.consultantId === user.id) ||
+    (user.role === "CLIENT_VIEWER" && project.clientUserId === user.id)
+  );
+}
