@@ -5,6 +5,7 @@ import {
   HelpCircle,
   LayoutDashboard,
   Settings,
+  Smartphone,
   Users,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -61,6 +62,13 @@ const NAV_ITEMS = [
     icon: HelpCircle,
     roles: ["ADMIN_PMD", "CONSULTANT", "CLIENT", "CLIENT_VIEWER", "STUDENT"] as const,
     priority: 60,
+  },
+  {
+    title: "API Movil",
+    href: "/mobile-api",
+    icon: Smartphone,
+    roles: ["ADMIN_PMD", "CONSULTANT", "CLIENT", "CLIENT_VIEWER", "STUDENT"] as const,
+    priority: 65,
   },
   {
     title: "Configuración",
