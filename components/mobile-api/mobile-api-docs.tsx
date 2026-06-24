@@ -60,6 +60,9 @@ Content-Type: application/json
   ]
 }`;
 
+const postmanAiOverviewExample = `GET {{baseUrl}}/api/mobile/overview
+Authorization: Bearer {{token}}`;
+
 const uploadFlowExample = `1. POST /api/mobile/activities/{activityId}/upload-request
 2. Flutter sube el archivo a uploadUrl
 3. POST /api/mobile/activities/{activityId}/reply
@@ -74,6 +77,44 @@ const uploadFlowExample = `1. POST /api/mobile/activities/{activityId}/upload-re
       "fileSize": 245760
     }
   ]
+}`;
+
+const aiResponseExample = `{
+  "success": true,
+  "summary": {
+    "projects": 4,
+    "collaborators": 126,
+    "activities": {
+      "total": 32,
+      "pending": 7,
+      "inReview": 6,
+      "rejected": 4,
+      "approved": 15
+    }
+  },
+  "predictiveInsights": {
+    "totalInspections": 32,
+    "highRiskCount": 5,
+    "mediumRiskCount": 11,
+    "lowRiskCount": 16,
+    "highRiskProbability": 72,
+    "topRiskZones": [
+      {
+        "label": "Subestacion principal",
+        "riskScore": 84
+      }
+    ],
+    "alerts": [
+      {
+        "title": "Probabilidad elevada de incidente electrico",
+        "message": "Se detectan hallazgos repetidos en inspecciones recientes."
+      }
+    ],
+    "recommendations": [
+      "Priorizar correccion de hallazgos electricos repetidos",
+      "Programar capacitacion focalizada en riesgo electrico"
+    ]
+  }
 }`;
 
 const flutterServiceExample = `class MobileApiService {
@@ -115,6 +156,19 @@ const flutterServiceExample = `class MobileApiService {
     );
   }
 }`;
+
+const flutterAiExample = `Future<http.Response> getAiOverview() async {
+  return http.get(
+    Uri.parse('$baseUrl/api/mobile/overview'),
+    headers: await _headers(),
+  );
+}
+
+// Idea de demo en pantalla:
+// - Card 1: Probabilidad de riesgo alto
+// - Card 2: Zonas mas criticas
+// - Card 3: Alertas IA
+// - Card 4: Recomendaciones accionables`;
 
 const endpoints = [
   {
@@ -318,6 +372,16 @@ export function MobileApiDocs() {
             <code>{postmanReplyExample}</code>
           </pre>
         </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm xl:col-span-3">
+          <div className="mb-3 text-lg font-semibold text-slate-900">Postman: demo IA movil</div>
+          <p className="mb-4 text-sm text-slate-600">
+            Este request permite mostrar el bloque predictivo de IA en la app movil usando el endpoint `overview`.
+          </p>
+          <pre className="overflow-x-auto rounded-xl bg-slate-950 p-4 text-sm text-slate-100">
+            <code>{postmanAiOverviewExample}</code>
+          </pre>
+        </div>
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -335,6 +399,34 @@ export function MobileApiDocs() {
           <pre className="overflow-x-auto rounded-xl bg-slate-950 p-4 text-sm text-slate-100">
             <code>{flutterServiceExample}</code>
           </pre>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="mb-3 text-lg font-semibold text-slate-900">Demo IA para Flutter</div>
+        <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+          <div className="space-y-4">
+            <p className="text-sm text-slate-600">
+              Para la demo IA en mobile, el equipo Flutter puede consumir `GET /api/mobile/overview` y renderizar el
+              bloque `predictiveInsights` como tarjetas, alertas y recomendaciones.
+            </p>
+            <ul className="space-y-2 text-sm text-slate-700">
+              <li>- Mostrar `highRiskProbability` como KPI principal o medidor circular.</li>
+              <li>- Mostrar `topRiskZones` como lista de zonas o sedes criticas.</li>
+              <li>- Mostrar `alerts` en un carrusel o cards de atencion prioritaria.</li>
+              <li>- Mostrar `recommendations` como acciones sugeridas por la IA demo.</li>
+              <li>- Combinar estos datos con el resumen de actividades para un dashboard movil ejecutivo.</li>
+            </ul>
+            <pre className="overflow-x-auto rounded-xl bg-slate-950 p-4 text-sm text-slate-100">
+              <code>{flutterAiExample}</code>
+            </pre>
+          </div>
+          <div>
+            <div className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">Respuesta demo esperada</div>
+            <pre className="overflow-x-auto rounded-xl bg-slate-950 p-4 text-sm text-slate-100">
+              <code>{aiResponseExample}</code>
+            </pre>
+          </div>
         </div>
       </section>
 
